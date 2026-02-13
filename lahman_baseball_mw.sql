@@ -95,14 +95,48 @@ SELECT ROUND(COUNT(CASE WHEN throws='L' THEN 1 END)::numeric/(COUNT(CASE WHEN th
 , ROUND(COUNT(CASE WHEN throws='R' THEN 1 END)::numeric/(COUNT(CASE WHEN throws='R' THEN 1 END)::numeric+COUNT(CASE WHEN throws='L' THEN 1 END)::numeric)*100, 4) AS right_percent
 FROM people;
 ----- 
-WITH lefties AS (
-	SELECT *
-	FROM people
-	WHERE throws = 'L')
-SELECT lefties.playerid,throws,awardid
--- SELECT COUNT(lefties)::numeric
-FROM lefties
+-- * Percentage of Cy Awarded Lefties - 14.80% * 
+SELECT
+	COUNT(DISTINCT people.playerid) AS lefties
+	, COUNT(CASE WHEN awardid='Cy Young Award' THEN 1 END) AS awarded_lefties
+	, ROUND((COUNT(CASE WHEN awardid='Cy Young Award' THEN 1 END)::numeric/COUNT(DISTINCT people.playerid)::numeric*100),2) AS lefty_award_percentage
+FROM people
 INNER JOIN awardsplayers
 USING(playerid)
-WHERE awardid='Cy Young Award';
-----
+WHERE throws='L';
+-- * Percentage of Cy Awarded Righties - 6.87% * 
+SELECT
+	COUNT(DISTINCT people.playerid) AS righties
+	, COUNT(CASE WHEN awardid='Cy Young Award' THEN 1 END) AS awarded_righties
+	, ROUND((COUNT(CASE WHEN awardid='Cy Young Award' THEN 1 END)::numeric/COUNT(DISTINCT people.playerid)::numeric*100),2) AS righty_award_percentage
+FROM people
+INNER JOIN awardsplayers
+USING(playerid)
+WHERE throws='R';
+-- 
+SELECT *
+FROM halloffame;
+
+-- * Percentage of Hall of Fame Lefties - 20.88% * 
+SELECT
+	COUNT(DISTINCT people.playerid) AS lefties
+	, COUNT(CASE WHEN inducted='Y' THEN 1 END) AS hof_lefties
+	, ROUND((COUNT(CASE WHEN inducted='Y' THEN 1 END)::numeric/COUNT(DISTINCT people.playerid)::numeric*100),2) AS lefty_hof_percentage
+FROM people
+INNER JOIN halloffame
+USING(playerid)
+WHERE throws='L';
+
+-- * Percentage of Hall of Fame Righties - 23.67% * 
+SELECT
+	COUNT(DISTINCT people.playerid) AS righties
+	, COUNT(CASE WHEN inducted='Y' THEN 1 END) AS hof_righties
+	, ROUND((COUNT(CASE WHEN inducted='Y' THEN 1 END)::numeric/COUNT(DISTINCT people.playerid)::numeric*100),2) AS righty_hof_percentage
+FROM people
+INNER JOIN halloffame
+USING(playerid)
+WHERE throws='R';
+
+
+
+
