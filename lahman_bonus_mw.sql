@@ -5,12 +5,13 @@
 
 
 SELECT *
-FROM (SELECT name AS nl_most_wins
+FROM (SELECT teamid,name AS nl_most_wins,w AS wins
      FROM teams AS t2  
      WHERE yearid = 2016
 	 	AND lgid='NL'
      ORDER BY w DESC 
-     LIMIT 1),(SELECT name AS al_most_wins
+     LIMIT 1)
+	 , (SELECT teamid,name AS al_most_wins,w AS wins
      FROM teams AS t1  
      WHERE yearid = 2016
 	 	AND lgid='AL'
@@ -21,8 +22,28 @@ FROM (SELECT name AS nl_most_wins
 -- SELECT DISTINCT lgid, ( ) FROM teams t WHERE yearid = 2016;
 
 -- b. One downside to using correlated subqueries is that you can only return exactly one row and one column. This means, for example that if we wanted to pull in not just the teamid but also the number of wins, we couldn't do so using just a single subquery. (Try it and see the error you get). Add another correlated subquery to your query on the previous part so that your result shows not just the teamid but also the number of wins by that team.
-
+(SELECT teamid,name,lgid AS league,w AS wins
+     FROM teams AS t2  
+     WHERE yearid = 2016
+	 	AND lgid='NL'
+     ORDER BY wins DESC 
+     LIMIT 1)
+UNION
+(SELECT teamid,name,lgid AS league,w AS wins
+     FROM teams AS t1  
+     WHERE yearid = 2016
+	 	AND lgid='AL'
+     ORDER BY wins DESC
+	 LIMIT 1);
 -- c. If you are interested in pulling in the top (or bottom) values by group, you can also use the DISTINCT ON expression (https://www.postgresql.org/docs/9.5/sql-select.html#SQL-DISTINCT). Rewrite your previous query into one which uses DISTINCT ON to return the top team by league in terms of number of wins in 2016. Your query should return the league, the teamid, and the number of wins.
+
+SELECT DISTINCT ON(league)teamid,name,lgid AS league,w AS wins
+FROM teams AS t2  
+WHERE (yearid = 2016
+	AND lgid='AL') OR
+		(yearid = 2016
+	AND lgid='NL')
+ORDER BY league DESC,wins DESC;
 
 -- d. If we want to pull in more than one column in our correlated subquery, another way to do it is to make use of the LATERAL keyword (https://www.postgresql.org/docs/9.4/queries-table-expressions.html#QUERIES-LATERAL). This allows you to write subqueries in FROM that make reference to columns from previous FROM items. This gives us the flexibility to pull in or calculate multiple columns or multiple rows (or both). Rewrite your previous query using the LATERAL keyword so that your result shows the teamid and number of wins for the team with the most wins from each league in 2016.
 
