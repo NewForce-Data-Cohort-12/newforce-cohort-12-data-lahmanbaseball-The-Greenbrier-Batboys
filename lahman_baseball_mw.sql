@@ -59,7 +59,7 @@ limit 1;
 
 
 -- Max
-SELECT DISTINCT playerid
+SELECT playerid
 	, CONCAT(namefirst,' ',namelast)AS full_name
 	, SUM(salary)::numeric::money AS total_salary
 FROM collegeplaying
@@ -68,7 +68,7 @@ USING(playerid)
 INNER JOIN salaries
 USING(playerid)
 WHERE schoolid='vandy'
-GROUP BY playerid, namefirst, namelast
+GROUP BY playerid, full_name
 ORDER BY total_salary DESC;
 
 
@@ -85,7 +85,6 @@ left join people
 using(playerid)
 where yearid = 2016
 group by namefirst, namelast;
-
 -- Max
 SELECT playerid
 	, CONCAT(namefirst,' ',namelast) AS name
@@ -153,7 +152,7 @@ GROUP BY decade
 ORDER BY decade;
 
 -- Max
-SELECT CONCAT(LEFT(yearid::text,3),'0')::numeric AS decade
+SELECT CONCAT(LEFT(yearid::text,3),'0s') AS decade
 	, ROUND((SUM(so)::numeric/SUM(g)::numeric),2) AS strikeouts_per
 	, ROUND((SUM(hr)::numeric/SUM(g)::numeric),2) AS homeruns_per
 FROM teams
@@ -175,7 +174,7 @@ JOIN people p
     ON b.playerid = p.playerid
 WHERE b.yearid = 2016
     AND (b.sb + b.cs) >= 20
-ORDER BY success_rate DESC;
+ORDER BY success_rate DESC
 LIMIT 1;
 
 -- Max
@@ -236,7 +235,6 @@ GROUP BY park,team
 HAVING sum(games) >= 10
 ORDER BY avg_attendance DESC 
 LIMIT 5;
-
 
 -- 9. Which managers have won the TSN Manager of the Year award in both the National League (NL) and the American League (AL)? Give their full name and the teams that they were managing when they won the award.
 -- Thomas
